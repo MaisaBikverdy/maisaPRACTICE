@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای جامع نرم‌افزار Petrel</title>
+    
+    <!-- فونت وزیرمتن -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #030305;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #8b5cf6; /* بنفش */
+            --secondary: #3b82f6; /* آبی */
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --card-bg: rgba(15, 15, 25, 0.7);
+            --card-border: rgba(139, 92, 246, 0.2);
+            --table-hover: rgba(59, 130, 246, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* افکت‌های نورانی پس‌زمینه */
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(150px);
+            z-index: -1;
+            opacity: 0.3;
+        }
+        .blob-1 {
+            top: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+        }
+        .blob-2 {
+            bottom: 20%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: var(--secondary);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            flex: 1;
+        }
+
+        /* هدر اصلی */
+        header {
+            text-align: center;
+            padding: 80px 0 60px;
+            animation: fadeInDown 1s ease;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        /* بخش‌ها (پارت‌ها) */
+        section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .part-badge {
+            display: inline-block;
+            background: var(--gradient);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+        }
+
+        p {
+            color: #cbd5e1;
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        /* حذف هرگونه تیک یا بولت از لیست‌ها */
+        ul li {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border-right: 3px solid var(--primary);
+            font-size: 0.95rem;
+        }
+
+        /* استایل جدول‌ها */
+        .table-container {
+            margin-top: 30px;
+            overflow-x: auto;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        th, td {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        td {
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--table-hover);
+            transition: background 0.3s ease;
+        }
+
+        .en-text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: ltr;
+            display: inline-block;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        /* لیست‌های خاص */
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .feature-list div {
+            background: rgba(59, 130, 246, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* بخش فوتر (تهیه‌کنندگان) */
+        footer {
+            background: linear-gradient(to top, rgba(139, 92, 246, 0.1), transparent);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px 20px 30px;
+            text-align: center;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .footer-content strong {
+            color: var(--text-main);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .footer-content strong::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: right;
+        }
+
+        .footer-content p:hover strong::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* انیمیشن‌ها */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* واکنش‌گرا */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.5rem; }
+            section { padding: 25px; }
+            h2 { font-size: 1.4rem; }
+            th, td { padding: 10px; font-size: 0.9rem; }
+            .footer-content p { font-size: 0.95rem; flex-direction: column; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- افکت‌های پس‌زمینه -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <div class="container">
+        
+        <header>
+            <h1>نرم‌افزار Petrel</h1>
+            <p>راهنمای جامع از معرفی تا بازار کار (محصول شرکت SLB)</p>
+        </header>
+
+        <!-- پارت ۱ -->
+        <section>
+            <span class="part-badge">پارت ۱</span>
+            <h2>توضیح کلی نرم‌افزار</h2>
+            <p>نرم‌افزار Petrel یکی از مهم‌ترین و شناخته‌شده‌ترین نرم‌افزارهای تخصصی در صنعت نفت و گاز و مهندسی مخازن است که برای مدل‌سازی زمین‌شناسی، تفسیر داده‌های لرزه‌ای، ساخت مدل سه‌بعدی مخزن و برنامه‌ریزی توسعه میدان‌های نفتی و گازی استفاده می‌شود.</p>
+            <p>اگر در رشته‌های مهندسی نفت، زمین‌شناسی، ژئوفیزیک یا مهندسی مخزن فعالیت می‌کنی، یادگیری آن می‌تواند یکی از مهارت‌های تخصصی مهم باشد. این نرم‌افزار کمک می‌کند اطلاعات مختلف زمین‌شناسی و مهندسی جمع‌آوری، تحلیل و به یک مدل سه‌بعدی از زیرسطح زمین تبدیل شوند. در واقع، Petrel ابزاری برای شناخت بهتر مخزن و تصمیم‌گیری دقیق‌تر درباره اکتشاف، حفاری و تولید نفت و گاز است.</p>
+            <p><strong>نکته:</strong> نرم‌افزار Petrel محصول شرکت <span class="en-text">SLB (Schlumberger)</span> است.</p>
+        </section>
+
+        <!-- پارت ۲ -->
+        <section>
+            <span class="part-badge">پارت ۲</span>
+            <h2>نرم‌افزار Petrel چیست؟</h2>
+            <p>نرم‌افزار Petrel یک محیط یکپارچه برای تحلیل و تفسیر اطلاعات زیرسطحی زمین است؛ یعنی داده‌هایی که از زیر سطح زمین به دست می‌آیند، مانند اطلاعات چاه‌ها، مغزه‌ها، نمودارهای پتروفیزیکی و داده‌های لرزه‌ای.</p>
+            <p>این داده‌ها در کنار یکدیگر قرار می‌گیرند و امکان ساخت مدل‌های دوبعدی و سه‌بعدی از مخزن را فراهم می‌کنند. هدف اصلی این نرم‌افزار آن است که داده‌های پراکنده زمین‌شناسی و ژئوفیزیکی را به یک تصویر سازگار از ساختار و ویژگی‌های مخزن تبدیل کند. این نرم‌افزار به متخصصان اجازه می‌دهد داده‌های مختلف را در یک محیط مشترک بررسی کنند.</p>
+        </section>
+
+        <!-- پارت ۳ -->
+        <section>
+            <span class="part-badge">پارت ۳</span>
+            <h2>هدف اصلی نرم‌افزار</h2>
+            <p>هدف اصلی آن ایجاد یک تصویر قابل تحلیل از مخزن زیرزمینی است تا متخصصان بتوانند قبل از انجام عملیات پرهزینه‌ای مانند حفاری، درباره شرایط زیرسطحی اطلاعات بیشتری به دست آورند.</p>
+        </section>
+
+        <!-- پارت ۴ + جدول ۱ -->
+        <section>
+            <span class="part-badge">پارت ۴</span>
+            <h2>کاربرد در بخش‌های صنعت نفت</h2>
+            <p>نرم‌افزار Petrel فقط مخصوص یک رشته نیست و چندین تخصص را به یکدیگر متصل می‌کند. جدول زیر حوزه‌های تخصصی و کاربرد آن‌ها را نشان می‌دهد:</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>حوزه تخصصی</th>
+                            <th>کاربرد Petrel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>زمین‌شناسی نفت</td>
+                            <td>مدل‌سازی ساختارهای زمین‌شناسی</td>
+                        </tr>
+                        <tr>
+                            <td>ژئوفیزیک</td>
+                            <td>تفسیر داده‌های لرزه‌ای</td>
+                        </tr>
+                        <tr>
+                            <td>پتروفیزیک</td>
+                            <td>تحلیل ویژگی‌های سنگ مخزن</td>
+                        </tr>
+                        <tr>
+                            <td>مهندسی مخزن</td>
+                            <td>مدل‌سازی استاتیک و آماده‌سازی مدل دینامیک</td>
+                        </tr>
+                        <tr>
+                            <td>مهندسی حفاری</td>
+                            <td>طراحی مسیر چاه و هدایت حفاری</td>
+                        </tr>
+                        <tr>
+                            <td>مهندسی تولید</td>
+                            <td>بررسی عملکرد مخزن و تولید</td>
+                        </tr>
+                        <tr>
+                            <td>ژئومکانیک</td>
+                            <td>بررسی تنش و رفتار مکانیکی سنگ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- پارت ۵ -->
+        <section>
+            <span class="part-badge">پارت ۵</span>
+            <h2>کاربرد در مهندسی مخزن</h2>
+            <p>این بخش یکی از مهم‌ترین کاربردهای Petrel در صنعت نفت است. مهندسی مخزن با این موضوع سروکار دارد که نفت و گاز چگونه درون مخزن حرکت می‌کنند و چه مقدار از آن‌ها را می‌توان تولید کرد. نرم‌افزار Petrel برای ساخت مدل زمین‌شناسی مخزن، آماده‌سازی مدل شبیه‌سازی و تحلیل عملکرد مخزن استفاده می‌شود.</p>
+            <p>مهم‌ترین کاربردها عبارتند از:</p>
+            <ul>
+                <li>ساخت مدل استاتیک مخزن</li>
+                <li>آماده‌سازی مدل دینامیک</li>
+                <li>تقسیم مخزن به سلول‌های سه‌بعدی</li>
+                <li>توزیع تخلخل و تراوایی در مدل</li>
+                <li>بررسی اشباع نفت و آب</li>
+                <li>بررسی تغییرات فشار مخزن</li>
+                <li>طراحی سناریوهای توسعه</li>
+                <li>بررسی محل مناسب چاه‌های جدید</li>
+                <li>تحلیل نتایج شبیه‌سازی</li>
+                <li>بررسی عدم قطعیت مدل</li>
+            </ul>
+        </section>
+
+        <!-- پارت ۶ -->
+        <section>
+            <span class="part-badge">پارت ۶</span>
+            <h2>مهم‌ترین قابلیت‌ها</h2>
+            <p>در این قسمت با ابزارهایی آشنا می‌شوی که هنگام کار با نرم‌افزار با آن‌ها مواجه خواهی شد:</p>
+            <div class="feature-list">
+                <div>تفسیر لرزه‌ای (Seismic Interpretation)</div>
+                <div>همبستگی چاه‌ها (Well Correlation)</div>
+                <div>مدل‌سازی ساختاری (Structural Modeling)</div>
+                <div>شبکه‌بندی مخزن (Grid Modeling)</div>
+                <div>مدل‌سازی رخساره‌ای (Facies Modeling)</div>
+                <div>مدل‌سازی خواص مخزن (Property Modeling)</div>
+                <div>محاسبه حجم مخزن (Volume Calculation)</div>
+                <div>برنامه‌ریزی چاه (Well Planning)</div>
+                <div>تحلیل عدم قطعیت (Uncertainty Analysis)</div>
+            </div>
+        </section>
+
+        <!-- پارت ۷ + جدول ۲ -->
+        <section>
+            <span class="part-badge">پارت ۷</span>
+            <h2>مزایای نرم‌افزار در صنعت نفت ایران</h2>
+            <p>مهم‌ترین مزیت Petrel این است که متخصصان رشته‌های مختلف می‌توانند اطلاعات خود را در یک محیط مشترک بررسی کنند. جدول زیر مهم‌ترین مزایا را نشان می‌دهد:</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>مزیت</th>
+                            <th>توضیح</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>مدل‌سازی سه‌بعدی</td>
+                            <td>مشاهده ساختار واقعی‌تر مخزن</td>
+                        </tr>
+                        <tr>
+                            <td>تلفیق داده‌ها</td>
+                            <td>ترکیب اطلاعات زمین‌شناسی، لرزه‌ای و چاه</td>
+                        </tr>
+                        <tr>
+                            <td>کاهش ریسک حفاری</td>
+                            <td>شناخت بهتر محل و شرایط چاه</td>
+                        </tr>
+                        <tr>
+                            <td>تحلیل مخزن</td>
+                            <td>بررسی تخلخل، تراوایی و اشباع</td>
+                        </tr>
+                        <tr>
+                            <td>صرفه‌جویی اقتصادی</td>
+                            <td>کاهش احتمال تصمیم‌های اشتباه و پرهزینه</td>
+                        </tr>
+                        <tr>
+                            <td>افزایش دقت مطالعات</td>
+                            <td>بررسی چندین سناریوی زمین‌شناسی</td>
+                        </tr>
+                        <tr>
+                            <td>ارتباط با شبیه‌ساز</td>
+                            <td>آماده‌سازی و تحلیل مدل‌های مخزن</td>
+                        </tr>
+                        <tr>
+                            <td>همکاری تخصصی</td>
+                            <td>امکان کار مشترک متخصصان رشته‌های مختلف</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- پارت ۸ -->
+        <section>
+            <span class="part-badge">پارت ۸</span>
+            <h2>پیش‌نیازهای یادگیری</h2>
+            <p>برای یادگیری نرم‌افزار Petrel اگر اطلاعات جزئی از رشته مربوطه خود (مانند مهندسی مخازن) داشته باشید و کار با کامپیوتر را به صورت آماتور بلد باشید، به راحتی می‌توانید این نرم‌افزار را یاد بگیرید.</p>
+        </section>
+
+        <!-- پارت ۹ + جدول ۳ -->
+        <section>
+            <span class="part-badge">پارت ۹</span>
+            <h2>بازار کار Petrel در ایران</h2>
+            <p>این بخش برای کسی که می‌خواهد در صنعت نفت ایران فعالیت کند بسیار مهم است. افرادی که به Petrel مسلط هستند، ممکن است در موقعیت‌های شغلی زیر فعالیت کنند:</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>عنوان شغلی</th>
+                            <th>وظایف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="en-text">Reservoir Geologist</span></td>
+                            <td>مدل‌سازی زمین‌شناسی مخزن</td>
+                        </tr>
+                        <tr>
+                            <td><span class="en-text">Geophysicist</span></td>
+                            <td>تفسیر داده‌های لرزه‌ای</td>
+                        </tr>
+                        <tr>
+                            <td><span class="en-text">Reservoir Engineer</span></td>
+                            <td>مطالعات مهندسی مخزن</td>
+                        </tr>
+                        <tr>
+                            <td><span class="en-text">Petrophysicist</span></td>
+                            <td>تحلیل اطلاعات پتروفیزیکی</td>
+                        </tr>
+                        <tr>
+                            <td><span class="en-text">Static Modeler</span></td>
+                            <td>ساخت مدل استاتیک</td>
+                        </tr>
+                        <tr>
+                            <td><span class="en-text">Geomodeler</span></td>
+                            <td>مدل‌سازی سه‌بعدی مخزن</td>
+                        </tr>
+                        <tr>
+                            <td><span class="en-text">Reservoir Characterization Specialist</span></td>
+                            <td>شناسایی و توصیف مخزن</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="margin-top: 25px;"><strong>در چه سازمان‌هایی ممکن است کاربرد داشته باشد؟</strong></p>
+            <ul>
+                <li>شرکت ملی نفت ایران</li>
+                <li>شرکت ملی مناطق نفت‌خیز جنوب</li>
+                <li>شرکت نفت و گاز اروندان</li>
+                <li>شرکت نفت و گاز پارس</li>
+                <li>شرکت مهندسی و توسعه نفت</li>
+                <li>شرکت‌های مشاور مطالعات مخزن</li>
+                <li>شرکت‌های پیمانکار خدمات مهندسی نفت</li>
+                <li>مراکز تحقیقاتی و دانشگاهی مرتبط با نفت</li>
+            </ul>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);">* این‌ها سازمان‌ها و حوزه‌های بالقوه مرتبط هستند؛ نه فهرست تأییدشده استخدام‌کنندگان فعلی Petrel.</p>
+
+            <div style="background: rgba(239, 68, 68, 0.1); border-right: 3px solid #ef4444; padding: 15px; border-radius: 10px; margin-top: 25px;">
+                <p style="margin: 0; color: #fca5a5;"><strong>آیا یادگیری Petrel برای استخدام کافی است؟</strong> خیر. کارفرما معمولاً علاوه بر تسلط به نرم‌افزار، دانش تخصصی رشته، توانایی تحلیل داده و تجربه انجام پروژه را نیز در نظر می‌گیرد.</p>
+            </div>
+        </section>
+
+        <!-- پارت ۱۰ -->
+        <section>
+            <span class="part-badge">پارت ۱۰</span>
+            <h2>آیا Petrel ارزش یادگیری دارد؟</h2>
+            <p>نرم‌افزار Petrel یکی از نرم‌افزارهای مهمی است که دانشجویان و فارغ‌التحصیلان رشته‌های مرتبط با نفت باید با آن آشنا باشند. به‌خصوص اگر قصد فعالیت در حوزه‌های زیر را داشته باشی:</p>
+            <ul>
+                <li>اکتشاف نفت و گاز</li>
+                <li>زمین‌شناسی نفت</li>
+                <li>ژئوفیزیک</li>
+                <li>مهندسی مخزن</li>
+                <li>مدل‌سازی استاتیک</li>
+                <li>توسعه میدان‌های نفتی</li>
+                <li>مطالعات ازدیاد برداشت</li>
+            </ul>
+
+            <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid var(--primary); padding: 20px; border-radius: 15px; margin-top: 25px;">
+                <p style="margin: 0; color: var(--text-main);"><strong>یک نکته را فراموش نکن:</strong> ارزش اصلی یک متخصص Petrel در تعداد ابزارهایی که بلد است نیست؛ در توانایی او برای تبدیل داده‌های زیرسطحی به یک مدل زمین‌شناسی معتبر و تصمیم مهندسی قابل دفاع است.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- فوتر (تهیه‌کنندگان) -->
+    <footer>
+        <div class="footer-content">
+            <p>تهیه شده توسط <strong>مایسا بیک وردی</strong> | دانشجو مهندسی کامپیوتر</p>
+            <p>جمع‌آوری شده توسط <strong>مرصاد آباد</strong> | دانشجو مهندسی نفت</p>
+            <p>با همراهی و مشاور<strong>علیرضا زراعت</strong> | دانشجو مهندسی نفت</p>
+        </div>
+    </footer>
+
+    <script>
+        // افکت ظاهر شدن نرم بخش‌ها هنگام اسکرول
+        const sections = document.querySelectorAll('section');
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
